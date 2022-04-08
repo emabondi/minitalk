@@ -12,33 +12,27 @@
 
 #include "minitalk.h"
 
-void	handler(int	sig)
+void	handler(int	sig, siginfo_t *info, void *context)
 {
 	static char	c = 0;
 	static int	i = 1;
-	int	j = 7;
 
-	while (j > 0){
-		ft_printf("%d", (c >> j) & 1);
-		j--;
-	}
-	ft_printf ("\n");
-	//ft_printf("ciao %d\n", i);
-	//ft_printf("sig:%d SIGUSR1:%d SIGUSR2:%d\n", sig, SIGUSR1, SIGUSR2);
-	if (i == 8)
-	{
-		i = 1;
-		ft_printf("%d\n", c);
-		c = 0;
-		return ;
-	}
 	if (sig == SIGUSR1)
 		c |= 0;
 	else
 		c |= 1;
+	if (i == 8)
+	{
+		i = 1;
+		if (c == 0)
+			kill(info->si_pid, SIGUSR2);
+		else
+			ft_printf("%c", c);
+		c = 0;
+		return ;
+	}
 	i++;
-	//ft_printf("%d\n", c);
-	c >>= 1;
+	c <<= 1;
 }
 
 int	main()
@@ -46,9 +40,9 @@ int	main()
 	struct sigaction	sa;
 
 	ft_printf("Server PID: %d\n", getpid());
-	sa.sa_handler = handler;
+	sa.sa_sigaction = handler;
 	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
+	sa.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 	while (1)

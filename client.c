@@ -18,6 +18,13 @@ void	ft_error(char *str)
 	exit (1);
 }
 
+void	handler(int	sig)
+{
+	if (sig == SIGUSR2)
+		ft_printf("The server has recived the message\n");
+	exit(0);
+}
+
 void	send_char(int pid, char c)
 {
 	int	i;
@@ -25,14 +32,18 @@ void	send_char(int pid, char c)
 	i = 7;
 	while (i >= 0)
 	{
-		printf("%d\n", (c >> i) & 1);
+		//printf("%d\n", (c >> i) & 1);
 		if (((c >> i) & 1) == 0)
+		{
 			if(kill(pid, SIGUSR1) == -1)
 				ft_error("PID");
+		}
 		else
+		{
 			if (kill(pid, SIGUSR2) == -1)
 				ft_error("PID");
-		sleep(1);
+		}
+		usleep(120); //da testare su mac
 		i--;
 	}
 }
@@ -45,6 +56,13 @@ void	send_message(int pid, char *msg)
 	while (msg[i] != '\0')
 	{
 		send_char(pid, msg[i]);
+		i++;
+	}
+	i = 0;
+	while (i < 8)
+	{
+		kill(pid, SIGUSR1);
+		usleep(100);
 		i++;
 	}
 }
@@ -62,13 +80,6 @@ int	check_args(int argc, char *argv[])
 			return (0);
 		i++;
 	}
-	i = 0;
-	while (argv[2][i] != '\0')
-	{
-		if (ft_isprint(argv[2][i]) == 0)
-			return (0);
-		i++;
-	}
 	return (1);
 }
 
@@ -81,6 +92,9 @@ int	main(int argc, char *argv[])
 		ft_error("ARG");
 	pid = ft_atoi(argv[1]);
 	msg = argv[2];
+	signal(SIGUSR2, handler);
 	send_message(pid, msg);
+	while (1)
+		pause();
 	return (0);
 }

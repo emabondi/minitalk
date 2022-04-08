@@ -20,4 +20,6 @@
 # include <stdio.h>
 # include "libft/libft.h"
 
+void	ft_error(char *str);
+
 #endif
