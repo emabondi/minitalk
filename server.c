@@ -12,11 +12,12 @@
 
 #include "minitalk.h"
 
-void	handler(int	sig, siginfo_t *info, void *context)
+void	handler(int sig, siginfo_t *info, void *context)
 {
 	static char	c = 0;
 	static int	i = 1;
 
+	context = NULL;
 	if (sig == SIGUSR1)
 		c |= 0;
 	else
@@ -35,7 +36,7 @@ void	handler(int	sig, siginfo_t *info, void *context)
 	c <<= 1;
 }
 
-int	main()
+int	main(void)
 {
 	struct sigaction	sa;
 

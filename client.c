@@ -12,13 +12,7 @@
 
 #include "minitalk.h"
 
-void	ft_error(char *str)
-{
-	ft_printf("%s error\n", str);  //da cambiare
-	exit (1);
-}
-
-void	handler(int	sig)
+void	handler(int sig)
 {
 	if (sig == SIGUSR2)
 		ft_printf("The server has recived the message\n");
@@ -32,10 +26,9 @@ void	send_char(int pid, char c)
 	i = 7;
 	while (i >= 0)
 	{
-		//printf("%d\n", (c >> i) & 1);
 		if (((c >> i) & 1) == 0)
 		{
-			if(kill(pid, SIGUSR1) == -1)
+			if (kill(pid, SIGUSR1) == -1)
 				ft_error("PID");
 		}
 		else
@@ -43,7 +36,7 @@ void	send_char(int pid, char c)
 			if (kill(pid, SIGUSR2) == -1)
 				ft_error("PID");
 		}
-		usleep(120); //da testare su mac
+		usleep(50);
 		i--;
 	}
 }
@@ -88,7 +81,7 @@ int	main(int argc, char *argv[])
 	int		pid;
 	char	*msg;
 
-	if(check_args(argc, argv) == 0)
+	if (check_args(argc, argv) == 0)
 		ft_error("ARG");
 	pid = ft_atoi(argv[1]);
 	msg = argv[2];
